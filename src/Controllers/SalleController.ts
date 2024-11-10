@@ -2,15 +2,18 @@ import { Request, Response } from 'express';
 import Salle from '../Models/SalleModel'; // Modèle de Salle
 import Cours from '../Models/CoursModel'; // Modèle de Cours
 import mongoose from 'mongoose';
+import Kindergarten from "../Models/kinderModel"
 
 // Création d'une nouvelle salle et assignation à un cours
 export const ajouterSalle = async (req: Request, res: Response) => {
     const { numero_salle, capacite, coursId } = req.body;
+    const {idkinder}=req.params
 
     try {
         const nouvelleSalle = new Salle({ numero_salle, capacite });
         const salleCreee = await nouvelleSalle.save();
 
+      await   Kindergarten.findByIdAndUpdate({_id:idkinder},{$push:{salle:salleCreee._id}})
         // Mettre à jour le cours pour assigner cette nouvelle salle
         await Cours.findByIdAndUpdate(coursId, { salle: salleCreee._id }); //associé l'id de cours avec l'id de salle
 
